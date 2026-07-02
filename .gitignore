@@ -4,3 +4,8 @@ dashboard_standalone.html
 __pycache__/
 *.pyc
 .DS_Store
+
+# Legacy weekly series — the SatSure site uses trends.json, not this
+data/**/timeseries.json
+# Stray/dev scripts that should never be published to the live site
+normal_rainfall.py
