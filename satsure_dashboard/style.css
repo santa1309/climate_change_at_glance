@@ -335,3 +335,16 @@ body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
   .map-pane { height: 60vh; min-height: 420px; }
   .action-bar { flex-wrap: wrap; height: auto; padding: 10px 16px; }
 }
+
+/* ============================================================ SEGMENTED TOGGLES */
+.seg { display: inline-flex; width: 100%; gap: 0; margin-bottom: 10px;
+  background: var(--teal-tint); border: 1px solid var(--teal-tint-2); border-radius: var(--radius); padding: 2px; }
+.seg-btn { flex: 1 1 0; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 11px; font-weight: 700; color: var(--teal-dark);
+  padding: 6px 4px; border-radius: calc(var(--radius) - 2px); transition: background .15s, color .15s; white-space: nowrap; }
+.seg-btn:hover { color: var(--teal); }
+.seg-btn.is-on { background: var(--surface); color: var(--teal-dark); box-shadow: var(--elev-1); }
+
+/* ============================================================ INDIA NATIONAL CARD */
+.india-card { border-top: 3px solid var(--teal); }
+.india-card .card-title::before { content: "🇮🇳"; margin-right: 6px; }

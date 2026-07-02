@@ -59,18 +59,27 @@
 
       <div class="filter-group">
         <span class="filter-group-label">When</span>
+        <div class="seg" role="group" aria-label="Time granularity">
+          <button class="seg-btn" data-gran="week">Weekly</button>
+          <button class="seg-btn" data-gran="month">Monthly</button>
+          <button class="seg-btn" data-gran="season">Seasonal</button>
+        </div>
         <div class="field-row">
           <div class="field">
             <label for="yearSelect">Year</label>
             <select id="yearSelect" class="select"></select>
           </div>
-          <div class="field">
+          <div class="field" id="fieldMonth">
             <label for="monthSelect">Month</label>
             <select id="monthSelect" class="select"></select>
           </div>
-          <div class="field">
+          <div class="field" id="fieldWeek">
             <label for="weekSelect">Week</label>
             <select id="weekSelect" class="select"></select>
+          </div>
+          <div class="field" id="fieldSeason" style="display:none">
+            <label for="seasonSelect">Season</label>
+            <select id="seasonSelect" class="select"></select>
           </div>
         </div>
         <div class="period-pill" id="dateRangeDisplay">
@@ -81,11 +90,15 @@
 
       <div class="filter-group">
         <span class="filter-group-label">Where</span>
+        <div class="seg" role="group" aria-label="Map level">
+          <button class="seg-btn" data-level="district">District</button>
+          <button class="seg-btn" data-level="state">State</button>
+        </div>
         <div class="field">
           <label for="stateSelect">State</label>
           <select id="stateSelect" class="select"></select>
         </div>
-        <div class="field">
+        <div class="field" id="fieldDistrict">
           <label for="districtSelect">District</label>
           <select id="districtSelect" class="select"></select>
         </div>
@@ -121,6 +134,34 @@
 
   <!-- ------------------ RIGHT INSIGHTS PANEL ------------------ -->
   <aside class="insights" aria-label="Insights">
+
+    <section class="card india-card" id="indiaCard">
+      <header class="card-head">
+        <h2 class="card-title">India · national</h2>
+        <span class="card-sub" id="indiaSub">—</span>
+      </header>
+      <div class="metric-grid">
+        <div class="metric">
+          <span class="metric-label">Actual</span>
+          <span class="metric-value" id="indiaActual">—</span>
+          <span class="metric-unit" id="indiaActualUnit">mm</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Normal</span>
+          <span class="metric-value" id="indiaNormal">—</span>
+          <span class="metric-unit" id="indiaNormalUnit">mm</span>
+        </div>
+        <div class="metric metric-emph">
+          <span class="metric-label" id="indiaMeasureLabel">Deviation</span>
+          <span class="metric-value" id="indiaMeasure">—</span>
+          <span class="metric-unit" id="indiaMeasureUnit">%</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Category</span>
+          <span class="metric-pill" id="indiaCategory">—</span>
+        </div>
+      </div>
+    </section>
 
     <section class="stat-row">
       <div class="stat-card stat-surplus">
@@ -206,7 +247,7 @@
     <span class="legend-title" id="legendTitle">Rainfall departure classes</span>
   </div>
   <div class="action-meta">
-    <span class="source-note"><span id="normalNote">Normal rainfall considered from 1961–2010</span> · Source: IMD</span>
+    <span class="source-note"><span id="normalNote">Normal rainfall considered from 1971–2020 (IMD LPA)</span> · Source: IMD</span>
     <button class="btn btn-text" id="resetViewBtn">Reset view</button>
   </div>
 </footer>
@@ -221,12 +262,14 @@
       </button>
     </header>
     <div class="dialog-body">
-      <p>An interactive atlas of <strong>weekly rainfall and temperature anomalies</strong> for every district in India, built from IMD daily gridded data.</p>
+      <p>An interactive atlas of <strong>rainfall and temperature anomalies</strong> for India, built from IMD daily gridded data.</p>
       <ul>
-        <li><strong>Rainfall</strong> — deviation from the 1961–2010 normal (%).</li>
+        <li><strong>Rainfall</strong> — deviation from the 1971–2020 IMD LPA normal (%).</li>
         <li><strong>Max / Min temperature</strong> — anomaly from the 2016–2024 normal (°C).</li>
+        <li><strong>Granularity</strong> — weekly, monthly, or by crop season (Kharif Jun–Sep · Rabi Oct–Mar · Zaid Apr–May).</li>
+        <li><strong>Level</strong> — switch the map between districts and states; the national (India) summary is always on the right.</li>
       </ul>
-      <p>Pick a year / month / week, switch the active layer, and click any district for its actual vs. normal values and a weekly trajectory chart. District values are area-weighted zonal means.</p>
+      <p>Pick a granularity and period, switch the active layer, and click any district or state for its actual vs. normal values and a trajectory chart. All values are area-weighted zonal means of the daily grids.</p>
     </div>
   </div>
 </div>
