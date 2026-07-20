@@ -5,7 +5,7 @@ anomalies** for India, built from IMD daily gridded data. SatSure design build.
 
 🌐 **Live dashboard:** https://santa1309.github.io/climate_change_at_glance/
 
-- **Rainfall** — deviation from the 1961–2010 normal (%)
+- **Rainfall** — deviation from the 1971–2020 normal (%)
 - **Max / Min temperature** — anomaly from the 2016–2024 normal (°C)
 
 Pick a year / month / week, switch the climate layer, and click any district for
