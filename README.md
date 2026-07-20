@@ -13,19 +13,6 @@ its actual vs. normal values and a weekly trajectory chart.
 
 ---
 
-## Repository layout
-
-```
-index.html              Root redirect → satsure_dashboard/index.html
-satsure_dashboard/      The dashboard (HTML + CSS + JS + logo)
-data/                   districts.geojson + rainfall/ + temperature/ (per-week JSON)
-.nojekyll               Serve every file as-is on GitHub Pages
-```
-
-This is a **static site** — GitHub Pages serves it directly. The dashboard loads
-data with relative paths, so the root link above just works.
-
-
 ## Data sources & methodology
 
 - **Rainfall:** IMD daily gridded rainfall; normal = mean of yearly weekly-sums
