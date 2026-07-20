@@ -25,18 +25,6 @@ data/                   districts.geojson + rainfall/ + temperature/ (per-week J
 This is a **static site** — GitHub Pages serves it directly. The dashboard loads
 data with relative paths, so the root link above just works.
 
-## Updating the data
-
-This repo is published from the data pipeline in the companion working copy.
-Run the one-click updater there:
-
-```
-update_satsure.bat
-```
-
-It regenerates any newly-completed weeks, syncs the data + dashboard into this
-repo, and pushes — after which GitHub Pages serves the new week within a minute
-or two.
 
 ## Data sources & methodology
 
