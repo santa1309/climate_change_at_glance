@@ -183,6 +183,24 @@
   function activeRecords() { return state.currentPeriodData?.[levelBlock()] || {}; }
   function activeGeoLayer() { return state.spatial === "state" ? state.statesLayer : state.geojsonLayer; }
 
+  // State the distribution is scoped to: an active selection, else the state dropdown
+  // filter (lets "choose a state" in district mode scope the panel without selecting one).
+  function scopeState() { return state.selectedState || $("#stateSelect").value || null; }
+
+  // Distribution/hero source: the scoped state's districts, else the whole active level.
+  // ponytail: reuses the existing stateToDistricts index; district records are keyed by
+  // name only, so a name shared across states can't be disambiguated (pre-existing limit).
+  function summaryRecords() {
+    const st = scopeState();
+    const dblk = state.currentPeriodData?.districts;
+    if (st && dblk) {
+      const out = {};
+      (state.stateToDistricts[st] || []).forEach(n => { if (dblk[n]) out[n] = dblk[n]; });
+      return out;
+    }
+    return activeRecords();
+  }
+
   // ===========================================================
   // Helpers
   // ===========================================================
@@ -222,6 +240,8 @@
     return `${rec.season} ${rec.year}`;
   }
 
+  const CACHE_BUST = Date.now();   // unique per page load
+
   async function fetchJSON(path) {
     if (typeof EMBEDDED_DATA !== "undefined") {
       if (path.includes("districts.geojson")) return EMBEDDED_DATA.districtsGeojson;
@@ -235,7 +255,9 @@
       const tp = path.match(/temperature\/(weeks|months|seasons)\/(.+)\.json/);
       if (tp) return EMBEDDED_DATA.temperature[tp[1]][tp[2]];
     }
-    const res = await fetch(path);
+    // Cache-bust per page load so a weekly-updated manifest/data is never served stale.
+    const url = path + (path.includes("?") ? "&" : "?") + "v=" + CACHE_BUST;
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch ${path}: ${res.status}`);
     return res.json();
   }
@@ -701,6 +723,8 @@
         else clearSelection();
       } else {
         refreshDistrictOptions();
+        updateSummary();
+        updateHeroStats();
       }
     });
     $("#districtSelect").addEventListener("change", () => {
@@ -755,6 +779,12 @@
     state.map.getPane("labels").style.zIndex = 450;
     state.map.getPane("labels").style.pointerEvents = "none";
     state.map.on("zoomend moveend", scheduleLabelRefresh);
+    // Click on empty map (outside India) clears the selection → all-India distribution.
+    // Guard against a feature click bubbling to the map (canvas fires both).
+    state.map.on("click", () => {
+      if (Date.now() - (state.lastFeatureClick || 0) < 150) return;
+      clearSelection();
+    });
   }
 
   function catColor(catKey) {
@@ -874,9 +904,12 @@
     $("#detailTitle").textContent = state.spatial === "state" ? "Select a state" : "Select a district";
     $("#detailSub").textContent = "Click the map or use the search";
     $("#detailBody").hidden = true;
+    updateSummary();
+    updateHeroStats();
   }
 
   async function selectDistrict(name, stName, { fromMap = false } = {}) {
+    state.lastFeatureClick = Date.now();
     const states = stateOf(name);
     if (!stName) {
       if (states.length === 1) stName = states[0];
@@ -901,10 +934,13 @@
     }
     syncLocationSelectorsTo(name, stName);
     updateDetail(name);
+    updateSummary();
+    updateHeroStats();
     drawTrendChart(name, await selectedSeries());
   }
 
   async function selectState(stName, { fromMap = false } = {}) {
+    state.lastFeatureClick = Date.now();
     state.selectedName = stName;
     state.selectedState = stName;
 
@@ -919,6 +955,8 @@
     }
     if ($("#stateSelect").value !== stName) $("#stateSelect").value = stName;
     updateDetail(stName);
+    updateSummary();
+    updateHeroStats();
     drawTrendChart(stName, await selectedSeries());
   }
 
@@ -969,7 +1007,7 @@
   function updateHeroStats() {
     const V = v();
     const catField = V.fields.category;
-    const recs = activeRecords();
+    const recs = summaryRecords();
     let surplus = 0, deficit = 0, total = 0;
     Object.values(recs).forEach(d => {
       total++;
@@ -990,8 +1028,8 @@
   function updateSummary() {
     const V = v();
     const catField = V.fields.category;
-    const recs = activeRecords();
-    const noun = state.spatial === "state" ? "states" : "districts";
+    const recs = summaryRecords();
+    const noun = scopeState() ? "districts" : (state.spatial === "state" ? "states" : "districts");
     const visibleCats = V.categories.filter(c => c.key !== "No Data");
     const counts = Object.fromEntries(visibleCats.map(c => [c.key, 0]));
     let withData = 0, total = 0;
@@ -1003,7 +1041,9 @@
       withData++;
     });
 
-    $("#summaryCount").textContent = withData === total ? `${total} ${noun}` : `${withData} of ${total} ${noun}`;
+    const scope = scopeState();
+    const pre = scope ? `${titleCase(scope)} · ` : "";
+    $("#summaryCount").textContent = pre + (withData === total ? `${total} ${noun}` : `${withData} of ${total} ${noun}`);
 
     const present = visibleCats.filter(c => counts[c.key] > 0);
 
